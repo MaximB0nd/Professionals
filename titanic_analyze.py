@@ -42,7 +42,11 @@ sns.countplot(data=df, x='Age', ax=ax[2, 0])
 ax[2, 0].set_title("Age")
 
 plt.tight_layout()
-plt.show()
+# plt.show()
+
+print(df["Cabin"].notnull().sum())
+print(df["Cabin"].isnull().sum())
+print(df["Cabin"].nunique())
 
 
 
