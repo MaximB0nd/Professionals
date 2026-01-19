@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv')
+df = pd.read_csv('titanic.csv')
 
 # print(df['Age'].describe())
 
@@ -80,6 +80,36 @@ df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
 df["isAlone"] = (df['FamilySize'] == 1).astype(int)
 df["isLargeFamily"] = (df['FamilySize'] > 4).astype(int)
 df['AgeClass'] = df['Age'] * df['Pclass']
+df["Mother"] = ((df['Sex'] == 1) & (df['Parch'] > 0) & (df['Age'] > 18)).astype(int)
 
+df["FareGroup"] = pd.qcut(df["Fare"], 4, labels=['Low', 'Medium', 'High', 'Very High'])
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
+scaler = StandardScaler()
+df["FareGroup"] = scaler.fit_transform(df[['Fare']])
 
+df = df.drop(['PassengerId', 'Name', 'Ticket'], axis=1)
+
+# numerical_features = []
+# categorical_features = []
+# binary_features = []
+#
+# for col in df.columns:
+#     if df[col].dtype in ['int64', 'float64']:
+#         if df[col].nunique() == 2:
+#             binary_features.append(col)
+#         else:
+#             numerical_features.append(col)
+#     elif df[col].dtype == 'object':
+#         categorical_features.append(col)
+
+categorical_features = ['Embarked', 'Title', 'AgeGroup']
+
+competed_df = pd.get_dummies(df, columns=categorical_features, drop_first=True)
+
+for column in competed_df.columns:
+    if competed_df[column].dtype == 'bool':
+        competed_df[column] = competed_df[column].map(int)
+
+with open('cleared_titanic.csv', 'w') as f:
+    f.write(competed_df.to_csv())
