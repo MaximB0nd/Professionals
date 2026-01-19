@@ -34,5 +34,52 @@ df['Embarked'] = df['Embarked'].fillna(df_embarked_median)
 df['Sex'] = df['Sex'].map({'male': 1, 'female': 0})
 # df['Sex'] = df['Sex'].apply(lambda x: 0 if x == 'male' else 1)
 
+df["Title"] = df["Name"].str.extract("([a-zA-Z]+)\.", expand=False)
+
+# print(df["Title"].value_counts())
+
+mapper = {
+    "Mr": "Mr",
+    "Miss": "Miss",
+    "Mrs": "Mrs",
+    "Master": "Master",
+    "Dr": "Rare",
+    "Rev": "Rare",
+    "Mlle": "Rare",
+    "Major": "Rare",
+    "Col": "Rare",
+    "Countess": "Rare",
+    "Capt": "Rare",
+    "Ms": "Rare",
+    "Sir": "Rare",
+    "Lady": "Rare",
+    "Mme": "Rare",
+    "Don": "Rare",
+    "Jonkheer": "Rare",
+}
+
+df["Title"] = df["Title"].map(mapper)
+# print(df["Title"].value_counts())
+
+def create_age_groups(age):
+    if age <= 16:
+        return 'Child'
+    elif age <= 32:
+        return 'Young Adult'
+    elif age <= 48:
+        return 'Adult'
+    elif age <= 64:
+        return 'Middle Aged'
+    else:
+        return 'Senior'
+
+df["AgeGroup"] = df["Age"].map(create_age_groups)
+# print(df["AgeGroup"].value_counts())
+
+df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
+df["isAlone"] = (df['FamilySize'] == 1).astype(int)
+df["isLargeFamily"] = (df['FamilySize'] > 4).astype(int)
+df['AgeClass'] = df['Age'] * df['Pclass']
+
 
 
