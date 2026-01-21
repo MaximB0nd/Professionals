@@ -10,14 +10,15 @@ def load_df():
 
 class TitanicDataset(Dataset):
     def __init__(self, df, target):
-        self.data = df.drop(target, axis=1).values.astype(np.float32)
-        self.target = df[target].values.astype(np.float32)
+        self.data = df.drop(target, axis=1).astype(np.float32)
+        self.target = df[target].astype(np.float32)
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
-        return torch.tensor(self.data[idx]).float(), torch.tensor(self.target[idx]).float()
+        # Возвращаем класс как целое число (0 или 1) вместо one-hot вектора
+        return torch.tensor(self.data.iloc[idx], dtype=torch.float32), torch.tensor([1 if self.target.iloc[idx] == 0 else 0, 1 if self.target.iloc[idx] == 1 else 0], dtype=torch.float32)
 
 class TitanicPrepare():
     def __init__(self, path, target):
@@ -33,12 +34,8 @@ class TitanicPrepare():
         train = TitanicDataset(train, target=self.target)
         test = TitanicDataset(test, target=self.target)
 
-        train_loader = DataLoader(train, batch_size=64, shuffle=True)
-        test_loader = DataLoader(test, batch_size=64, shuffle=True)
+        train_loader = DataLoader(train, batch_size=16, shuffle=True)
+        test_loader = DataLoader(test, batch_size=16, shuffle=True)
 
         return train_loader, test_loader
-
-
-
-
 
